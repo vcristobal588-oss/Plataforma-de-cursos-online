@@ -33,13 +33,18 @@ class DaoBase:
         finally:
             self._cerrar(cursor, conexion)
 
-    def ejecutar(self, operaciones):
-        """Ejecuta una lista de (consulta, parametros) como UNA transaccion.
+    def ejecutar(self, operaciones, parametros=None):
+        """Ejecuta una sentencia o varias en UNA sola transaccion.
+
+        Acepta: ejecutar("SQL", (p,)) para una sentencia, o una lista de
+        tuplas (consulta, parametros) para varias.
 
         Si todas las operaciones tienen exito hace commit; si alguna
         falla, revierte TODO con rollback. Retorna las filas afectadas
         de la ultima operacion.
         """
+        if parametros is not None:
+            operaciones = [(operaciones, parametros)]
         return self._correr(operaciones, con_id=False)
 
     def ejecutar_con_id(self, consulta, parametros):
@@ -74,9 +79,9 @@ class DaoBase:
         if error.errno == errorcode.ER_DUP_ENTRY:
             return RegistroDuplicado("El RUT o el correo electronico ya estan registrados.")
         if error.errno == errorcode.ER_NO_REFERENCED_ROW_2:
-            return ErrorBaseDatos("La operacion fallo: el usuario referenciado no existe.")
+            return ErrorBaseDatos("La operacion fallo: el registro referenciado no existe.")
         if error.errno == errorcode.ER_ROW_IS_REFERENCED_2:
-            return ErrorBaseDatos("No se puede eliminar: existen registros que dependen de este usuario.")
+            return ErrorBaseDatos("No se puede eliminar: existen registros que dependen de este registro.")
         # Mensaje generico a proposito: no se exponen consultas,
         # tablas ni parametros internos (seguridad).
         return ErrorBaseDatos(f"Operacion no completada en la base de datos (codigo {error.errno}).")
