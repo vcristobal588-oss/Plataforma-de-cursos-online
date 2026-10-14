@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# models.py: archivo generado por Peewee con credenciales de BD en claro (no versionar)
+models.py

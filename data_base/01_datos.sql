@@ -9,6 +9,17 @@ CREATE TABLE usuario (
     rol VARCHAR(10) NOT NULL
 ) ENGINE=InnoDB;
 
+CREATE TABLE direccion (
+    id_direccion INT AUTO_INCREMENT PRIMARY KEY,
+    rut_usuario VARCHAR(12) NOT NULL,
+    comuna VARCHAR(50) NOT NULL,
+    calle VARCHAR(100) NOT NULL,
+    numero VARCHAR(10) NULL,
+    departamento VARCHAR(10) NULL,
+    tipo_direccion VARCHAR(20) NULL,
+    FOREIGN KEY (rut_usuario) REFERENCES usuario(rut)
+) ENGINE=InnoDB;
+
 CREATE TABLE estudiantes (
     rut_estudiante VARCHAR(12),
     carrera VARCHAR(100),
