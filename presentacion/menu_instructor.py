@@ -17,23 +17,22 @@ from negocio.permisos import (
     puede_administrar_cursos,
     requiere_permiso,
 )
+from presentacion.validaciones import (
+    LONG_TITULO,
+    a_entero,
+    validar_longitud,
+)
 
 MSG = "Los estudiantes no pueden administrar cursos."
-
-
-def _a_entero(valor):
-    """Convierte un valor de entrada a entero. Lanza ValueError si no es numerico."""
-    try:
-        return int(valor)
-    except (TypeError, ValueError):
-        raise ValueError("El id debe ser un numero entero.")
 
 
 @requiere_permiso(puede_administrar_cursos, MSG)
 def crear_curso(usuario, titulo, descripcion=None):
     """Crea un curso en borrador a nombre del instructor autenticado."""
     try:
-        # El constructor de Curso valida el titulo (capa de negocio).
+        # validar_longitud: no superar la columna titulo VARCHAR(100);
+        # el constructor de Curso valida que no venga vacio (capa de negocio).
+        titulo = validar_longitud(titulo, LONG_TITULO, "El titulo del curso")
         curso = Curso(titulo, descripcion or "", rut_instructor=usuario.id)
     except ValueError as e:
         print(f"Dato no valido: {e}")
@@ -80,7 +79,8 @@ def ver_cursos(usuario):
 def agregar_modulo(usuario, id_curso, titulo):
     """Agrega un modulo a un curso propio del instructor autenticado."""
     try:
-        id_curso = _a_entero(id_curso)
+        id_curso = a_entero(id_curso)
+        titulo = validar_longitud(titulo, LONG_TITULO, "El titulo del modulo")
         # El constructor de Modulo valida el titulo (capa de negocio).
         modulo = Modulo(titulo, id_curso=id_curso)
     except (TypeError, ValueError) as e:
@@ -102,7 +102,8 @@ def agregar_modulo(usuario, id_curso, titulo):
 def agregar_actividad(usuario, id_modulo, titulo):
     """Agrega una actividad a un modulo de un curso propio del instructor."""
     try:
-        id_modulo = _a_entero(id_modulo)
+        id_modulo = a_entero(id_modulo)
+        titulo = validar_longitud(titulo, LONG_TITULO, "El titulo de la actividad")
         # El constructor de Actividad valida el titulo (capa de negocio).
         actividad = Actividad(titulo, id_modulo=id_modulo)
     except (TypeError, ValueError) as e:
@@ -124,7 +125,7 @@ def agregar_actividad(usuario, id_modulo, titulo):
 def publicar_curso(usuario, id_curso):
     """Publica un curso propio del instructor (borrador -> publicado)."""
     try:
-        id_curso = _a_entero(id_curso)
+        id_curso = a_entero(id_curso)
     except (TypeError, ValueError) as e:
         print(f"Dato no valido: {e}")
         return False
@@ -147,7 +148,7 @@ def publicar_curso(usuario, id_curso):
 def publicar_actividad(usuario, id_actividad):
     """Publica una actividad de un curso propio del instructor."""
     try:
-        id_actividad = _a_entero(id_actividad)
+        id_actividad = a_entero(id_actividad)
     except (TypeError, ValueError) as e:
         print(f"Dato no valido: {e}")
         return False
@@ -170,7 +171,7 @@ def publicar_actividad(usuario, id_actividad):
 def eliminar_curso(usuario, id_curso):
     """Elimina un curso propio con todo su contenido (accion destructiva)."""
     try:
-        id_curso = _a_entero(id_curso)
+        id_curso = a_entero(id_curso)
     except (TypeError, ValueError) as e:
         print(f"Dato no valido: {e}")
         return False
