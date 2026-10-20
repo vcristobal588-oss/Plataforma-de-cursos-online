@@ -7,7 +7,14 @@ from data_base.dao_base import DaoBase
 
 
 class ActividadDAO(DaoBase):
-    """CRUD de la tabla actividad."""
+    """CRUD de la tabla actividad.
+
+    `buscar_por_id` y `eliminar` son las versiones genericas heredadas de
+    DaoBase (declaradas por el contrato tabla/clave).
+    """
+
+    tabla = "actividad"
+    clave = "id_actividad"
 
     def crear(self, id_modulo, titulo):
         """Inserta una actividad en borrador (publicada=0) y retorna su id."""
@@ -17,18 +24,9 @@ class ActividadDAO(DaoBase):
         )
         return self.ejecutar_con_id(consulta, (id_modulo, titulo))
 
-    def buscar_por_id(self, id_actividad):
-        """Retorna la fila de la actividad como dict, o None si no existe."""
-        consulta = "SELECT * FROM actividad WHERE id_actividad = %s"
-        filas = self.consultar(consulta, (id_actividad,))
-        return filas[0] if filas else None
-
     def listar_por_modulo(self, id_modulo):
-        """Retorna las actividades de un modulo, como dicts."""
-        consulta = (
-            "SELECT * FROM actividad WHERE id_modulo = %s ORDER BY id_actividad"
-        )
-        return self.consultar(consulta, (id_modulo,))
+        """Retorna las actividades de un modulo, como dicts (CRUD generico)."""
+        return self.listar_por("id_modulo", id_modulo, orden="id_actividad")
 
     def actualizar(self, id_actividad, titulo):
         """Actualiza el titulo de la actividad. Retorna True si hubo filas afectadas."""
@@ -41,11 +39,6 @@ class ActividadDAO(DaoBase):
             "UPDATE actividad SET publicada = 1 "
             "WHERE id_actividad = %s AND publicada = 0"
         )
-        return self.ejecutar(consulta, (id_actividad,)) > 0
-
-    def eliminar(self, id_actividad):
-        """Elimina la actividad. Retorna True si existia y fue eliminada."""
-        consulta = "DELETE FROM actividad WHERE id_actividad = %s"
         return self.ejecutar(consulta, (id_actividad,)) > 0
 
     def pertenece_a(self, id_actividad, rut_instructor):

@@ -9,6 +9,9 @@ from data_base.dao_base import DaoBase
 class ModuloDAO(DaoBase):
     """CRUD de la tabla modulo."""
 
+    tabla = "modulo"
+    clave = "id_modulo"
+
     def crear(self, id_curso, titulo):
         """Inserta un modulo. El orden se calcula solo (MAX(orden)+1 del curso).
 
@@ -21,18 +24,9 @@ class ModuloDAO(DaoBase):
         )
         return self.ejecutar_con_id(consulta, (id_curso, titulo, id_curso))
 
-    def buscar_por_id(self, id_modulo):
-        """Retorna la fila del modulo como dict, o None si no existe."""
-        consulta = "SELECT * FROM modulo WHERE id_modulo = %s"
-        filas = self.consultar(consulta, (id_modulo,))
-        return filas[0] if filas else None
-
     def listar_por_curso(self, id_curso):
-        """Retorna los modulos de un curso ordenados, como dicts."""
-        consulta = (
-            "SELECT * FROM modulo WHERE id_curso = %s ORDER BY orden, id_modulo"
-        )
-        return self.consultar(consulta, (id_curso,))
+        """Retorna los modulos de un curso ordenados (CRUD generico heredado)."""
+        return self.listar_por("id_curso", id_curso, orden="orden, id_modulo")
 
     def actualizar(self, id_modulo, titulo):
         """Actualiza el titulo del modulo. Retorna True si hubo filas afectadas."""

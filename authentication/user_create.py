@@ -1,3 +1,16 @@
+"""Script historico de alta de usuario (version anterior al patron DAO).
+
+SE CONSERVA COMO EVIDENCIA, no es el flujo activo del sistema.
+
+Problemas que motivaron su descarte como implementacion vigente:
+- Credenciales de la BD y datos de prueba en claro dentro del codigo.
+- Alta sin transaccion y sin cierre en finally: un fallo a mitad de la
+  ejecucion dejaba la conexion abierta y sin rollback.
+- Registraba un solo INSERT: hoy el alta es atomica en usuario + fila de
+  rol (estudiantes/instructor) con rollback automatico.
+
+Flujo activo: presentacion/menu_auth.py -> UsuarioDAO.registrar()
+"""
 import mysql.connector
 import bcrypt
 

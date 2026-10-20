@@ -12,6 +12,9 @@ from negocio.actividad import Actividad
 class CursoDAO(DaoBase):
     """CRUD de la tabla curso."""
 
+    tabla = "curso"
+    clave = "id_curso"
+
     def crear(self, rut_instructor, titulo, descripcion=None):
         """Inserta un curso en borrador y retorna su id (lastrowid)."""
         consulta = (
@@ -20,22 +23,26 @@ class CursoDAO(DaoBase):
         )
         return self.ejecutar_con_id(consulta, (rut_instructor, titulo, descripcion))
 
-    def buscar_por_id(self, id_curso):
-        """Retorna la fila del curso como dict, o None si no existe."""
-        consulta = "SELECT * FROM curso WHERE id_curso = %s"
-        filas = self.consultar(consulta, (id_curso,))
-        return filas[0] if filas else None
+    def listar_todos(self, estado=None):
+        """Retorna todos los cursos con el nombre de su instructor (para catalogos).
 
-    def listar_todos(self):
-        """Retorna todos los cursos con el nombre de su instructor (para catalogos)."""
+        estado=None lista todos; estado='publicado' devuelve el catalogo
+        visible para los estudiantes (criterio 2.1.3.G.10: consulta filtrada).
+        """
         consulta = (
             "SELECT c.id_curso, c.titulo, c.descripcion, c.estado, "
             "c.rut_instructor, u.nombre_completo AS instructor "
             "FROM curso c "
             "INNER JOIN usuario u ON u.rut = c.rut_instructor "
+            "WHERE (%s IS NULL OR c.estado = %s) "
             "ORDER BY c.id_curso"
         )
-        return self.consultar(consulta)
+        return self.consultar(consulta, (estado, estado))
+
+    def listar_publicados(self):
+        """Catalogo que ve el estudiante: unicamente cursos publicados."""
+        return self.listar_todos(estado="publicado")
+
 
     def listar_por_instructor(self, rut_instructor):
         """Retorna las filas de los cursos de un instructor (dicts)."""

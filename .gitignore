@@ -217,5 +217,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# models.py: archivo generado por Peewee con credenciales de BD en claro (no versionar)
+# models.py: si se regenera con pwiz en la raíz, no versionar (trae credenciales
+# de la BD en claro). La versión saneada y documentada del código descartado
+# vive en docs/evidencia/models_peewee_descartado.py
 models.py

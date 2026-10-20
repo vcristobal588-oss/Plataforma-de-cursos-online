@@ -9,6 +9,22 @@ from negocio.permisos import ROL_ESTUDIANTE, ROL_INSTRUCTOR, ROLES_VALIDOS
 class UsuarioDAO(DaoBase):
     """Operaciones CRUD sobre la tabla `usuario` y sus tablas de rol."""
 
+    tabla = "usuario"
+    clave = "rut"
+
+    def buscar_por_id(self, rut):
+        """Version segura del CRUD genérico: NUNCA retorna la contraseña.
+
+        Sobreescribe DaoBase.buscar_por_id (que haría SELECT *) por el
+        principio de mínimo privilegio: el hash bcrypt no debe salir de la
+        capa de datos.
+        """
+        return self._fila(
+            "SELECT rut, nombre_completo, correo_electronico, rol "
+            "FROM usuario WHERE rut = %s",
+            (rut,),
+        )
+
     def autenticar(self, correo, contrasena):
         """Valida las credenciales con bcrypt.
 

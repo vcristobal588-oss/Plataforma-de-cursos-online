@@ -3,7 +3,13 @@ from data_base.dao_base import DaoBase
 
 
 class DireccionDAO(DaoBase):
-    """CRUD de direcciones asociadas a un usuario (FK: rut_usuario)."""
+    """CRUD de direcciones asociadas a un usuario (FK: rut_usuario).
+
+    `listar_todos` y `eliminar` se heredan del CRUD generico de DaoBase.
+    """
+
+    tabla = "direccion"
+    clave = "id_direccion"
 
     def agregar(self, rut_usuario, comuna, calle, numero=None,
                 departamento=None, tipo_direccion=None):
@@ -29,10 +35,4 @@ class DireccionDAO(DaoBase):
             ("UPDATE direccion SET comuna = %s, calle = %s, numero = %s, departamento = %s, "
              "tipo_direccion = %s WHERE id_direccion = %s",
              (comuna, calle, numero, departamento, tipo_direccion, id_direccion)),
-        ]) > 0
-
-    def eliminar(self, id_direccion):
-        """Elimina una direccion. Retorna True si existia."""
-        return self.ejecutar([
-            ("DELETE FROM direccion WHERE id_direccion = %s", (id_direccion,)),
         ]) > 0
