@@ -1,0 +1,4 @@
+bcrypt>=5.0
+mysql-connector-python>=9.0
+peewee>=3.17
+requests>=2.32
